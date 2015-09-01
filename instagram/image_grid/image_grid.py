@@ -2,50 +2,100 @@ import os
 import sys
 from PySide import QtGui, QtCore
 
+class IconButton(QtGui.QPushButton):
+
+    def __init__(self, pixmap, name, parent=None):
+        QtGui.QPushButton.__init__(self, pixmap, parent)
+        self.name = name
+        self.pixmap = pixmap
+
+        self.off_pixmap = QtGui.QPixmap()
+        self.off_pixmap.fill(fillColor=QtCore.Qt.white)
+
+        self.is_off = False
+
+    def toggle_me(self, val):
+        self.is_off = not self.is_off
+        pm = self.off_pixmap if self.is_off else self.pixmap
+        self.setIcon(pm)
+
+
 class Example(QtGui.QWidget):
 
     def __init__(self):
         super(Example, self).__init__()
         self.initUI()
+        self.exclude_list = []
 
     def initUI(self):
         
-        self.num_col = 4
-        self.v_box = QtGui.QVBoxLayout(self)
+        num_col = 1
+        v_box = QtGui.QVBoxLayout(self)
+        h_box = QtGui.QHBoxLayout()
+        v_box.addLayout(h_box)
 
-        self.scrollarea = QtGui.QScrollArea()
-        self.scrollarea.setWidgetResizable(True)
-        self.v_box.addWidget(self.scrollarea)
+        pixmap = QtGui.QPixmap('highres/11325467_827835693952267_1145886703_n.jpg')
+        lbl = QtGui.QLabel()
+        lbl.setPixmap(pixmap)
+        h_box.addWidget(lbl)
 
-        self.btn_widget = QtGui.QWidget()
-        grid_layout = QtGui.QGridLayout(self.btn_widget)
-        self.scrollarea.setWidget(self.btn_widget)
+        h_box.addStretch()
+        
+        scrollarea = QtGui.QScrollArea()
+        scrollarea.setFixedWidth(130)
+        scrollarea.setWidgetResizable(True)
+        scrollarea.setFrameStyle(QtGui.QFrame.NoFrame)
+        h_box.addWidget(scrollarea)
 
-        self.img_fold = r"pics"
+        btn_widget = QtGui.QWidget()
+        scroll_vbox = QtGui.QVBoxLayout(btn_widget)
+        scrollarea.setWidget(btn_widget)
 
-        for index, img in enumerate(os.listdir(self.img_fold)):
+        thumbs_dir = r"thumbs"
 
-            img_path = os.path.join(self.img_fold, img)
+        for img in os.listdir(thumbs_dir):
+
+            img_path = os.path.join(thumbs_dir, img)
+            #print(os.path.splitext(img)[1] is '')
+            if img.split('.')[-1] not in ('jpeg'):
+                continue
 
             pixmap = QtGui.QPixmap(img_path)
 
-            lbl = QtGui.QPushButton(pixmap, "")
+            #btn = QtGui.QPushButton(pixmap, "")
+            btn = IconButton(pixmap, img)
+            btn.clicked.connect(self.thumb_clicked)
             
-            lbl.setCheckable(True)
+            
+            #btn.setCheckable(True)
             size = pixmap.size()
             w, h = size.toTuple()
-            lbl.setIconSize(size)
-            lbl.setFixedSize(w+30, h+30)
+            btn.setIconSize(size)
+            btn.setFixedSize(w+30, h+30)
             
-            row = index % self.num_col
-            col = index / self.num_col
-            print(row, col)
-            grid_layout.addWidget(lbl, col, row)
-            
+            scroll_vbox.addWidget(btn)
+
 
         self.setGeometry(50, 50, 400, 400)
         self.setWindowTitle('Image viewer')
         self.show()
+
+    def thumb_clicked(self):
+
+        modifiers = QtGui.QApplication.keyboardModifiers()
+
+        if modifiers == QtCore.Qt.ControlModifier:
+
+            if self.sender().is_off:
+                self.exclude_list.remove(self.sender().name)
+            else:
+                self.exclude_list.append(self.sender().name)
+                
+            self.sender().toggle_me(False)
+            
+        else:
+            print('Number of excluded images: {}'.format(len(self.exclude_list)))
+            print(self.sender().name)
 
 def main():
 
