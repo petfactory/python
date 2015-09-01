@@ -101,8 +101,10 @@ def on_user_media_feed(dest_dir, client_secret, access_token, year=None, max_cou
 
 client_secret = str(raw_input("Client secret: "))
 access_token = str(raw_input("Access token: "))
-year = int(raw_input("Year: "))
-maxcount = int(raw_input("Max count: "))
+year = raw_input("Year [None]:")
+year = None if year == '' else int(year)
+maxcount = raw_input("Max count [None]: ")
+maxcount = None if maxcount == '' else int(maxcount)
 dest_dir = str(raw_input("Directory to download to: "))
 
 on_user_media_feed(dest_dir, client_secret, access_token, year, maxcount)
