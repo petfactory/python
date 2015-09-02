@@ -29,14 +29,14 @@ print(protrusion_x)
 
 pos_list = []
 for x in range(num_img):
-	col = x % num_col
-	row = x / num_row
-	#print(col, row)
+    col = x % num_col
+    row = x / num_row
+    #print(col, row)
 
-	x = col * img_pivot_spacing_x + protrusion_x
-	y = row * img_pivot_spacing_y + protrusion_y
-	print(x, y)
-	pos_list.append((x,y))
+    x = col * img_pivot_spacing_x + protrusion_x
+    y = row * img_pivot_spacing_y + protrusion_y
+    print(x, y)
+    pos_list.append((x,y))
 
 
 
@@ -44,15 +44,19 @@ with Drawing() as draw:
 
 
     for p in pos_list:
-    	x, y = p
+        x, y = p
         #draw.point(x, y)
         left = x-img_half_width
         top = y-img_half_height
         right = x+img_half_width
         bottom = y+img_half_height
+
+        draw.fill_color = Color('lightblue')
+        draw.stroke_color = Color('black')
+        draw.stroke_width = 4
         draw.rectangle(left, top, right, bottom)
 
     with Image(width=page_width, height=page_height, background=Color('lightblue')) as image:
         draw(image)
         image.format = 'jpeg'
-    	image.save(filename='img_grid.jpg')
+        image.save(filename='img_grid.jpg')
