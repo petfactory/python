@@ -34,10 +34,12 @@ class Example(QtGui.QWidget):
         h_box = QtGui.QHBoxLayout()
         v_box.addLayout(h_box)
 
+        
+        self.image_widget = QtGui.QLabel()
         pixmap = QtGui.QPixmap('highres/11325467_827835693952267_1145886703_n.jpg')
-        lbl = QtGui.QLabel()
-        lbl.setPixmap(pixmap)
-        h_box.addWidget(lbl)
+        self.image_widget.setPixmap(pixmap)
+        h_box.addWidget(self.image_widget)
+
 
         h_box.addStretch()
         
@@ -96,6 +98,9 @@ class Example(QtGui.QWidget):
         else:
             print('Number of excluded images: {}'.format(len(self.exclude_list)))
             print(self.sender().name)
+            #pixmap = QtGui.QPixmap('highres/{}'.format(self.sender().name))
+            pixmap = QtGui.QPixmap('highres/{}'.format('11379787_969363229761322_1240199567_n.jpg'))
+            self.image_widget.setPixmap(pixmap)
 
 def main():
 
