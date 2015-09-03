@@ -31,28 +31,49 @@ class Example(QtGui.QWidget):
 
     def initUI(self):
 
-        main_hbox = QtGui.QHBoxLayout(self)
+        outer_vbox = QtGui.QVBoxLayout(self)
+        outer_vbox.setContentsMargins(0,0,0,0)
 
+        #menubar = self.menuBar()
+        menubar = QtGui.QMenuBar()
+        outer_vbox.addWidget(menubar)
+        menubar.setNativeMenuBar(False)
+
+        file_menu = menubar.addMenu('File')
+
+        load_json_action = QtGui.QAction('Load json', self)
+        load_json_action.triggered.connect(self.load_btn_clicked)
+        file_menu.addAction(load_json_action)
+
+        save_json_action = QtGui.QAction('Save json', self)
+        save_json_action.triggered.connect(self.save_btn_clicked)
+        file_menu.addAction(save_json_action)
+
+        print_pdf_action = QtGui.QAction('Print PDF', self)
+        print_pdf_action.triggered.connect(self.print_pdf_btn_clicked)
+        file_menu.addAction(print_pdf_action)
+
+
+        main_hbox = QtGui.QHBoxLayout()
+        outer_vbox.addLayout(main_hbox)
+        main_hbox.setContentsMargins(7,7,7,7)
+        
         # the main image viewer
         viewer_vbox = QtGui.QVBoxLayout()
         main_hbox.addLayout(viewer_vbox)
         self.image_widget = QtGui.QLabel()
         self.image_widget.setMinimumSize(640,640)
         viewer_vbox.addWidget(self.image_widget)
+        viewer_vbox.addStretch()
 
+        '''
         button_hbox = QtGui.QHBoxLayout()
         viewer_vbox.addLayout(button_hbox)
+
         load_btn = QtGui.QPushButton('Load')
         load_btn.clicked.connect(self.load_btn_clicked)
         button_hbox.addWidget(load_btn)
-
-        save_btn = QtGui.QPushButton('Save')
-        save_btn.clicked.connect(self.save_btn_clicked)
-        button_hbox.addWidget(save_btn)
-
-        print_pdf_btn = QtGui.QPushButton('Print PDF')
-        print_pdf_btn.clicked.connect(self.print_pdf_btn_clicked)
-        button_hbox.addWidget(print_pdf_btn)
+        '''
 
         scrollarea = QtGui.QScrollArea()
         scrollarea.setFixedWidth(130)
@@ -209,10 +230,21 @@ class Example(QtGui.QWidget):
 
         print('pdf created!')
 
+    def debug_load(self, file_path):
+
+        with open(file_path, 'r') as f:
+            data = f.read()
+
+        if data:
+            json_data = json.loads(data)
+            self.json_data = json_data
+            self.add_images(json_data)
+
 def main():
 
     app = QtGui.QApplication(sys.argv)
     ex = Example()
+    ex.debug_load('/Users/johan/Dev/python/instagram/image_grid/highres/instagram.json')
     sys.exit(app.exec_())
 
 
