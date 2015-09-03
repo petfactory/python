@@ -46,8 +46,11 @@ def do_print():
     font_regular = set_font(name='Avenir Next', style='Regular', size=14)
 
     printer = QtGui.QPrinter()
+
     printer.setOutputFormat(QtGui.QPrinter.PdfFormat)
-    printer.setOutputFileName('text.pdf')
+    printer.setOutputFileName('text_test.pdf')
+
+
     printer.setResolution(dpi)
     #printer.setOutputToFile(True)
     #printer.setPaperSize(QtCore.QSizeF(500,500), QtGui.QPrinter.Unit.DevicePixel)
