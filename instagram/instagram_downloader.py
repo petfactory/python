@@ -38,11 +38,6 @@ def on_user_media_feed(dest_dir, client_secret, access_token, year=None, max_cou
         # save to disk
         urllib.urlretrieve(url, os.path.join(dest_dir, filename))
 
-        # use wand and imagemagick to resave the image so we can open in adobe apps
-        with Image(filename=url) as img:
-            img.format = 'jpeg'
-            img.save(filename=os.path.join(dest_dir, filename))
-
         media_list.append(md)
 
         return True
@@ -99,6 +94,15 @@ def on_user_media_feed(dest_dir, client_secret, access_token, year=None, max_cou
             f.write(json_data)
             f.close()
 
+
+        # use wand and imagemagick to resave the image so we can open in adobe apps
+        for media in media_list:
+            img_path = os.path.join(dest_dir, media.get('filename'))
+
+            with Image(filename=img_path) as img:
+                img.format = 'jpeg'
+                img.save(filename=img_path)
+'''
 client_secret = str(raw_input("Client secret: "))
 access_token = str(raw_input("Access token: "))
 year = raw_input("Year [None]:")
@@ -108,3 +112,4 @@ maxcount = None if maxcount == '' else int(maxcount)
 dest_dir = str(raw_input("Directory to download to: "))
 
 on_user_media_feed(dest_dir, client_secret, access_token, year, maxcount)
+'''
