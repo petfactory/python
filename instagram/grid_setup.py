@@ -14,8 +14,6 @@ def get_img_pos(image_size_list,
                 pivot_spacing_y,
                 margin):
 
-    #protrusion_x = (page_width - ((num_col-1) * img_pivot_spacing_x)) *.5 + offset_x
-    #protrusion_y = (page_height - ((num_row-1) * img_pivot_spacing_y)) *.5 + offset_y
     page_width_margin = page_width + margin*2
     page_height_margin = page_height + margin*2
 
@@ -35,7 +33,7 @@ def get_img_pos(image_size_list,
         # calculate the center pivot for the image grid
         x = col * pivot_spacing_x + protrusion_x
         y = row * pivot_spacing_y + protrusion_y
-        print(x, y)
+        #print(x, y)
         #pos_list.append((x,y))
 
         width = image_size_list[i][0]
@@ -50,45 +48,7 @@ def get_img_pos(image_size_list,
         rect_list.append(rect)
         pivot_list.append((x,y))
 
-    
-    ###################################################
-    
-    # debug render
-
-    ###################################################
-
-
-    with Drawing() as draw:
-
-        draw.fill_color = Color('lightblue')
-        draw.stroke_color = Color('#999')
-        draw.stroke_width = 1
-
-        # margin
-        draw.rectangle(margin, margin, page_width+margin, page_height+margin)
-
-        
-        # page center
-        draw.line((page_width_margin*.5, 0), (page_width_margin*.5, page_height_margin))
-        draw.line((0, page_height_margin*.5), (page_width_margin, page_height_margin*.5))
-
-        draw.stroke_color = Color('black')
-        draw.stroke_width = 2
-
-        for rect in rect_list:
-            draw.rectangle(rect.left(), rect.top(), rect.left()+rect.width(), rect.top()+rect.height())
-
-
-        draw.fill_color = Color('black')
-        for pivot in pivot_list:
-            
-            draw.point(pivot[0], pivot[1])
-
-        with Image(width=page_width_margin, height=page_height_margin, background=Color('lightblue')) as image:
-            draw(image)
-            image.format = 'jpeg'
-            image.save(filename='debug_render_grid.jpg')
-
+    return rect_list
 
 
 def test_layout(pivot_spacing_x):
@@ -98,7 +58,7 @@ def test_layout(pivot_spacing_x):
     size = (img_width, img_height)
     image_size_list = [size,size,size,size]
 
-    #image_size_list = [(130,130), (90,120), (120,90), (100, 90)]
+    image_size_list = [(130,130), (90,120), (120,90), (100, 90)]
 
     page_width = 500
     page_height = 500
@@ -114,16 +74,16 @@ def test_layout(pivot_spacing_x):
 
     margin = 20
 
-    get_img_pos(image_size_list,
-                page_width,
-                page_height,
-                num_col,
-                num_row,
-                offset_x,
-                offset_y,
-                pivot_spacing_x,
-                pivot_spacing_y,
-                margin)
+    return get_img_pos( image_size_list,
+                        page_width,
+                        page_height,
+                        num_col,
+                        num_row,
+                        offset_x,
+                        offset_y,
+                        pivot_spacing_x,
+                        pivot_spacing_y,
+                        margin)
 
 
 
