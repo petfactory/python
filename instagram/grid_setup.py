@@ -51,28 +51,31 @@ def get_img_pos(image_size_list,
     return rect_list
 
 
-def test_layout(pivot_spacing_x):
+def test_layout(pivot_spacing_x, pivot_spacing_y, size, num=4, num_col=2, num_row=2):
 
-    img_width = 100
-    img_height = 100
-    size = (img_width, img_height)
-    image_size_list = [size,size,size,size]
+    #img_width = 100
+    #img_height = 100
+    #size = (img_width, img_height)
+    usize = (size, size)
 
-    image_size_list = [(130,130), (90,120), (120,90), (100, 90)]
+    #image_size_list = [usize,usize,usize,usize]
+    image_size_list = [usize for x in range(num)]
+
+    #image_size_list = [(130,130), (90,120), (120,90), (100, 90)]
 
     page_width = 500
     page_height = 500
 
     #pivot_spacing_x = 250
-    pivot_spacing_y = 250
+    #pivot_spacing_y = 250
 
     offset_x = 0
     offset_y = 0
 
-    num_col = 2
-    num_row = 2
+    #num_col = 2
+    #num_row = 2
 
-    margin = 20
+    margin = 0
 
     return get_img_pos( image_size_list,
                         page_width,

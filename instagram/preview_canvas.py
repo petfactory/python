@@ -3,17 +3,14 @@ from PySide import QtGui, QtCore
 
 class PreviewCanvas(QtGui.QWidget):
     
-    def __init__(self):
-        super(PreviewCanvas, self).__init__()
+    def __init__(self, parent=None):
+        super(PreviewCanvas, self).__init__(parent)
 
+        #self.setGeometry(50, 50, 500, 500)
         self.setMinimumSize(500,500)
         self.rect_list = None
-        self.initUI()
-        
-    def initUI(self):      
-
-        self.setWindowTitle('Points')
-        #self.show()
+        self.setWindowTitle('Preview')
+        self.show()
 
     def set_rect_list(self, rect_list):
         self.rect_list = rect_list
@@ -29,11 +26,21 @@ class PreviewCanvas(QtGui.QWidget):
         
     def drawPoints(self, qp):
       
-        qp.setPen(QtCore.Qt.red)
+        qp.setPen(QtGui.QColor(60, 60, 60))
         size = self.size()
         
-        qp.drawRect(0,0,500,500)
+        qp.fillRect(0, 0, 500, 500, QtCore.Qt.white)
+        color = QtGui.QColor(220, 220, 220)
 
         for rect in self.rect_list:
-            qp.drawRect(rect)
+            qp.fillRect(rect, color)
+
+def main():
+    
+    app = QtGui.QApplication(sys.argv)
+    a = PreviewCanvas()
+    sys.exit(app.exec_())
+
+if __name__ == '__main__':
+    main()
 

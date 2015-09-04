@@ -42,7 +42,7 @@ def do_print():
 
 
     # get the fonts
-    font_light = set_font(name='Avenir Next', style='Ultra Light', size=14)
+    font_light = set_font(name='Avenir Next', style=' ', size=14)
     font_regular = set_font(name='Avenir Next', style='Regular', size=14)
 
     printer = QtGui.QPrinter()
@@ -63,19 +63,21 @@ def do_print():
 
     painter.setFont(font_light)
         
-    painter.drawText(QtCore.QRect(10, 450, 400, 60), QtCore.Qt.AlignLeft, u'24 Maj');
+    painter.drawText(QtCore.QRect(10, 450, 400, 60), QtCore.Qt.AlignLeft, u'24 Maj')
 
+    painter.drawText(QtCore.QRect(10, 450, 400, 60), QtCore.Qt.AlignLeft, u"<span style='font-family:Avenir Next; font-style:Ultra Light; font-size:50pt; color:#999999;'>23 Maj </span><span style='font-family:Avenir Next; font-size:50pt; font-style:Regular; color:#333333;'>Hejsan lilla fåret</span>")
     painter.setFont(font_regular)  
     #painter.drawText(100,480,u'Hejsan fåret!')
 
     painter.drawText(QtCore.QRect(10, 450, 400, 60), QtCore.Qt.TextWordWrap, u"              Hejsan lilla fåret. Nu ska vi testa var detta stycke exempelvis byter rad. Det ska bli spännande!")
 
     # draw image
+    '''
     image = QtGui.QImage()
     image.load('../highres/11379787_969363229761322_1240199567_n.jpg')
     dest_rect = QtCore.QRect(edge_offet,edge_offet,img_width_pixel,img_height_pixel )
     painter.drawImage(dest_rect, image)
-
+    '''
     painter.end()
     print('Created a pdf')
 

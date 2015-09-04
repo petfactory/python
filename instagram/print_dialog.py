@@ -25,10 +25,25 @@ class InstagramDialog(QtGui.QDialog):
 
         main_vbox.addStretch()
         
-        pivot_spacing_x_slider = QtGui.QDoubleSpinBox()
-        pivot_spacing_x_slider.setRange(0,1000)
-        pivot_spacing_x_slider.valueChanged.connect(self.pivot_spacing_x_change)
-        main_vbox.addWidget(pivot_spacing_x_slider)
+        self.pivot_spacing_x_slider = QtGui.QDoubleSpinBox()
+        self.pivot_spacing_x_slider.setRange(0,1000)
+        self.pivot_spacing_x_slider.setValue(220)
+        self.pivot_spacing_x_slider.valueChanged.connect(self.slider_change)
+        main_vbox.addWidget(self.pivot_spacing_x_slider)
+
+
+        self.pivot_spacing_y_slider = QtGui.QDoubleSpinBox()
+        self.pivot_spacing_y_slider.setRange(0,1000)
+        self.pivot_spacing_y_slider.setValue(220)
+        self.pivot_spacing_y_slider.valueChanged.connect(self.slider_change)
+        main_vbox.addWidget(self.pivot_spacing_y_slider)
+
+
+        self.size_slider = QtGui.QDoubleSpinBox()
+        self.size_slider.setRange(0,1000)
+        self.size_slider.setValue(130)
+        self.size_slider.valueChanged.connect(self.slider_change)
+        main_vbox.addWidget(self.size_slider)
 
 
 
@@ -41,11 +56,12 @@ class InstagramDialog(QtGui.QDialog):
         main_vbox.addWidget(buttons)
         self.show()
 
-    def pivot_spacing_x_change(self, value):
-        #print(value)
-        rect_list = grid_setup.test_layout(value)
-        print(rect_list)
+        self.slider_change()
+
+    def slider_change(self):
+        rect_list = grid_setup.test_layout(self.pivot_spacing_x_slider.value(), self.pivot_spacing_y_slider.value(), self.size_slider.value(), 4, 2, 2)
         self.preview_canvas.set_rect_list(rect_list)
+
 
     def client_secret(self):
         return 12

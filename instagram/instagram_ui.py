@@ -3,6 +3,7 @@ from PySide import QtGui, QtCore
 from wand.image import Image
 import instagram_downloader
 import download_popup
+import print_dialog
 
 class IconButton(QtGui.QPushButton):
 
@@ -72,15 +73,6 @@ class Example(QtGui.QWidget):
         viewer_vbox.addWidget(self.image_widget)
         viewer_vbox.addStretch()
 
-        '''
-        button_hbox = QtGui.QHBoxLayout()
-        viewer_vbox.addLayout(button_hbox)
-
-        load_btn = QtGui.QPushButton('Load')
-        load_btn.clicked.connect(self.load_btn_clicked)
-        button_hbox.addWidget(load_btn)
-        '''
-
         scrollarea = QtGui.QScrollArea()
         scrollarea.setFixedWidth(130)
         scrollarea.setWidgetResizable(True)
@@ -97,7 +89,7 @@ class Example(QtGui.QWidget):
 
     def download_from_instagram(self):
 
-        client_secret, access_token, result = download_popup.InstagramDialog.getInstagramInfo()
+        client_secret, access_token, result = download_popup.InstagramDialog.getInstagramInfo(self)
 
         if result:
             dir_path = QtGui.QFileDialog.getExistingDirectory(None, 'Choose dir to download to', None, QtGui.QFileDialog.ShowDirsOnly)
@@ -224,7 +216,9 @@ class Example(QtGui.QWidget):
             self.image_widget.setPixmap(pixmap)
 
     def print_pdf_btn_clicked(self):
-        print('Printing pdf')
+
+        print_dialog.InstagramDialog.getInstagramInfo(self)
+        return
 
         if not self.json_data:
             print('No json data loaded')
