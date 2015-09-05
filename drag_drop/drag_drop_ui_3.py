@@ -28,12 +28,20 @@ class Button(QtGui.QPushButton):
             event.ignore()
 
     def dropEvent(self, event):
+
+        #print(event.mimeData())
+
+        if event.mimeData().hasImage():
+            image = QtGui.QImage(event.mimeData().imageData())
+            print('Dropped an image', image)
+
         if event.mimeData().hasUrls:
             event.setDropAction(QtCore.Qt.CopyAction)
             event.accept()
             links = []
             for url in event.mimeData().urls():
                 links.append(str(url.toLocalFile()))
+                print (12, url.path())
 
             self.fileDropped.emit(links)
 

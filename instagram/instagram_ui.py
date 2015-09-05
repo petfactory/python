@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os, sys, json, pprint, copy
 from PySide import QtGui, QtCore
 from wand.image import Image
@@ -7,9 +9,13 @@ import print_dialog
 
 class IconButton(QtGui.QPushButton):
 
-    def __init__(self, pixmap, name, parent=None):
+    def __init__(self, pixmap, name, date, text, parent=None):
         QtGui.QPushButton.__init__(self, pixmap, parent)
         self.name = name
+        self.date = date
+        self.text = text
+        #print(text)
+
         self.pixmap = pixmap
 
         self.off_pixmap = QtGui.QPixmap()
@@ -71,7 +77,18 @@ class Example(QtGui.QWidget):
         self.image_widget = QtGui.QLabel()
         self.image_widget.setMinimumSize(640,640)
         viewer_vbox.addWidget(self.image_widget)
-        viewer_vbox.addStretch()
+        #viewer_vbox.addStretch()
+
+        self.date_label = QtGui.QLabel()
+        viewer_vbox.addWidget(self.date_label)
+
+        self.caption_textedit = QtGui.QTextEdit()
+        self.caption_textedit.setMaximumWidth(640)
+        viewer_vbox.addWidget(self.caption_textedit)
+        #self.caption_lineedit.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Expanding)
+
+
+
 
         scrollarea = QtGui.QScrollArea()
         scrollarea.setFixedWidth(130)
@@ -97,7 +114,7 @@ class Example(QtGui.QWidget):
             if dir_path:
                 instagram_downloader.on_user_media_feed(dest_dir=dir_path, client_secret=client_secret, access_token=access_token, year=2015, max_count=10)
 
-    def create_thumb(self, img_path):
+    def create_thumb(self, img_path, date, text):
 
         img = Image(filename=os.path.join(self.source_dir, img_path))
         img.resize(self.thumb_size, self.thumb_size)
@@ -105,7 +122,7 @@ class Example(QtGui.QWidget):
         pixmap = QtGui.QPixmap()
         pixmap.loadFromData(img.make_blob())
 
-        btn = IconButton(pixmap, img_path)
+        btn = IconButton(pixmap, img_path, date, text)
         btn.clicked.connect(self.thumb_clicked)
 
         size = pixmap.size()
@@ -118,19 +135,27 @@ class Example(QtGui.QWidget):
     def add_images(self, json_data):
 
         media_list = json_data.get('media')
+        #print(media_list)
+        #return
 
         if not media_list:
             print('Could not get media list from json')
             return None
 
         for media in media_list:
-            self.create_thumb(media.get('filename'))
+            self.create_thumb(media.get('filename'), media.get('date'), media.get('text'))
 
         self.scroll_vbox.addStretch()
         pixmap = QtGui.QPixmap(os.path.join(self.source_dir, media_list[0].get('filename')))
         self.image_widget.setPixmap(pixmap)
 
-        return json_data
+        self.date_label.setText(media_list[0].get('date'))
+        text = media_list[0].get('text')
+        text = text.encode('UTF-8')
+        print(text)
+        self.caption_textedit.setText(text)
+
+        #return json_data
 
     def load_btn_clicked(self):
 
@@ -151,6 +176,7 @@ class Example(QtGui.QWidget):
             if data:
 
                 self.source_dir = os.path.dirname(file_name)
+                print(self.source_dir)
 
                 json_data = json.loads(data)
                 self.json_data = json_data
@@ -215,6 +241,13 @@ class Example(QtGui.QWidget):
             pixmap = QtGui.QPixmap(os.path.join(self.source_dir, self.sender().name))
             self.image_widget.setPixmap(pixmap)
 
+            self.date_label.setText(self.sender().date)
+            text = self.sender().text
+            #print(text)
+            text = text.encode('utf-8')
+            print(text)
+            self.caption_textedit.setText(text)
+
     def print_pdf_btn_clicked(self):
 
         print_dialog.InstagramDialog.getInstagramInfo(self)
@@ -245,17 +278,20 @@ class Example(QtGui.QWidget):
 
         with open(file_path, 'r') as f:
             data = f.read()
+            self.source_dir = os.path.dirname(file_path)
+            print(self.source_dir)
 
         if data:
             json_data = json.loads(data)
             self.json_data = json_data
             self.add_images(json_data)
 
+
 def main():
 
     app = QtGui.QApplication(sys.argv)
     ex = Example()
-    #ex.debug_load('/Users/johan/Dev/python/instagram/image_grid/highres/instagram.json')
+    ex.debug_load('/Users/johan/Desktop/anna/instagram.json')
     sys.exit(app.exec_())
 
 
