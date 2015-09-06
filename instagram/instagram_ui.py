@@ -90,6 +90,11 @@ class Example(QtGui.QWidget):
         viewer_vbox.addWidget(self.caption_textedit)
 
 
+        save_caption_button = QtGui.QPushButton('Save text')
+        viewer_vbox.addWidget(save_caption_button)
+
+
+
         #fontDB = QtGui.QFontDatabase()
         #print(fontDB)
         #fontDB.addApplicationFont("/Library/Fonts/Apple Color Emoji.ttf")
