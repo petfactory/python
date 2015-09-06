@@ -3,29 +3,32 @@
 import os, sys, json, pprint, copy
 from PySide import QtGui, QtCore
 from wand.image import Image
+from wand.drawing import Drawing
+from wand.color import Color
 import instagram_downloader
 import download_popup
 import print_dialog
 
 class IconButton(QtGui.QPushButton):
 
-    def __init__(self, pixmap, name, date, text, parent=None):
-        QtGui.QPushButton.__init__(self, pixmap, parent)
+    def __init__(self, pixmap_on, pixmap_off, name, date, text, parent=None):
+        QtGui.QPushButton.__init__(self, pixmap_on, parent)
         self.name = name
         self.date = date
         self.text = text
         #print(text)
 
-        self.pixmap = pixmap
+        self.pixmap_on = pixmap_on
+        self.pixmap_off = pixmap_off
 
-        self.off_pixmap = QtGui.QPixmap()
-        self.off_pixmap.fill(fillColor=QtCore.Qt.white)
+        #self.off_pixmap = QtGui.QPixmap()
+        #self.off_pixmap.fill(fillColor=QtCore.Qt.white)
 
         self.is_off = False
 
     def toggle_me(self, val):
         self.is_off = not self.is_off
-        pm = self.off_pixmap if self.is_off else self.pixmap
+        pm = self.pixmap_off if self.is_off else self.pixmap_on
         self.setIcon(pm)
 
 
@@ -85,6 +88,17 @@ class Example(QtGui.QWidget):
         self.caption_textedit = QtGui.QTextEdit()
         self.caption_textedit.setMaximumWidth(640)
         viewer_vbox.addWidget(self.caption_textedit)
+
+
+        #fontDB = QtGui.QFontDatabase()
+        #print(fontDB)
+        #fontDB.addApplicationFont("/Library/Fonts/Apple Color Emoji.ttf")
+        sansFont = QtGui.QFont("Menlo", 18)
+        #sansFont = QtGui.QFont("Apple Color Emoji", 18)
+        
+        #print(sansFont)
+        self.caption_textedit.setFont(sansFont)
+        #print(a)
         #self.caption_lineedit.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Expanding)
 
 
@@ -100,7 +114,7 @@ class Example(QtGui.QWidget):
         self.scroll_vbox = QtGui.QVBoxLayout(scroll_widget)
         scrollarea.setWidget(scroll_widget)
 
-        self.setGeometry(50, 50, 400, 400)
+        self.setGeometry(0, 50, 400, 400)
         self.setWindowTitle('Image viewer')
         self.show()
 
@@ -119,13 +133,23 @@ class Example(QtGui.QWidget):
         img = Image(filename=os.path.join(self.source_dir, img_path))
         img.resize(self.thumb_size, self.thumb_size)
 
-        pixmap = QtGui.QPixmap()
-        pixmap.loadFromData(img.make_blob())
+        pixmap_on = QtGui.QPixmap()
+        pixmap_on.loadFromData(img.make_blob())
 
-        btn = IconButton(pixmap, img_path, date, text)
+        with Drawing() as draw:
+            draw.stroke_color = Color('white')
+            draw.stroke_width = 3
+            draw.line((0, 0), (self.thumb_size, self.thumb_size))
+            draw.line((0, self.thumb_size), (self.thumb_size , 0))
+            draw(img)
+
+        pixmap_off = QtGui.QPixmap()
+        pixmap_off.loadFromData(img.make_blob())
+        
+        btn = IconButton(pixmap_on, pixmap_off, img_path, date, text)
         btn.clicked.connect(self.thumb_clicked)
 
-        size = pixmap.size()
+        size = pixmap_on.size()
         w, h = size.toTuple()
         btn.setIconSize(size)
         btn.setFixedSize(w+20, h+20)
@@ -151,8 +175,12 @@ class Example(QtGui.QWidget):
 
         self.date_label.setText(media_list[0].get('date'))
         text = media_list[0].get('text')
-        text = text.encode('UTF-8')
-        print(text)
+        #text = text.encode('UTF-8')
+        #print(text)
+        #print(type(text))
+
+        #text = text.decode("utf-32")
+
         self.caption_textedit.setText(text)
 
         #return json_data
@@ -244,8 +272,8 @@ class Example(QtGui.QWidget):
             self.date_label.setText(self.sender().date)
             text = self.sender().text
             #print(text)
-            text = text.encode('utf-8')
-            print(text)
+            #text = text.encode('utf-8')
+            print(text.encode('utf-8'))
             self.caption_textedit.setText(text)
 
     def print_pdf_btn_clicked(self):
