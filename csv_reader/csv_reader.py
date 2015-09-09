@@ -148,11 +148,15 @@ class MyModel(QtCore.QAbstractTableModel):
         self.endInsertRows()
         return True
 
-    def headerData(self, col, orientation, role):
+    def headerData(self, section, orientation, role):
         if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
-            return self.headers[col]
-        return None
+            return self.headers[section]
 
+        elif orientation == QtCore.Qt.Vertical and role == QtCore.Qt.DisplayRole:
+            return section
+
+        else:
+            return None
 
 
 class MyTableView(QtGui.QWidget):
@@ -168,7 +172,8 @@ class MyTableView(QtGui.QWidget):
         self.tableview.setAlternatingRowColors(True)
         main_vbox.addWidget(self.tableview)
 
-        path = r'example.csv'
+        #path = r'example.csv'
+        path = r'/Users/johan/Desktop/export.csv'
         header_list, row_list = self.get_csv_file(path)
 
         self.model = MyModel([], header_list)
