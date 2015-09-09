@@ -9,32 +9,23 @@ class Item(object):
 
     def __init__(self, datestring, transaction, category, amount, balance):
 
-        #locale.setlocale(locale.LC_ALL, "es_ES")
-        #locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
-
         self.date = QtCore.QDate.fromString(datestring, QtCore.Qt.ISODate)
         self.transaction = transaction.decode('utf-8')
         self.category = category.decode('utf-8')
 
-        # check for empty string
-        #self.amount = locale.atof(amount) if amount else  0
-        #self.balance = locale.atof(balance) if balance else  0
+        # a bit weird to use the german locale,
+        # but swedish will not pars the string
+        german = QtCore.QLocale(QtCore.QLocale.German)
 
-        # need to get back to using locale...
-        if amount:
-            amount = amount.replace(".", "")
-            amount = amount.replace(",", ".")
-            self.amount = float(amount)
+        self.amount, amount_ok = german.toDouble(amount)
+        if not amount_ok:
+            print('Could not parse amount string')
+            self.amount = None
 
-        else: self.amount = 0
-
-        if balance:
-            balance = balance.replace(".", "")
-            balance = balance.replace(",", ".")
-            self.balance = float(balance)
-
-        else: self.balance = 0
-
+        self.balance, balance_ok = german.toDouble(balance)
+        if not balance_ok:
+            print('Could not parse balance string')
+            self.balance = None
 
         #QtCore.QDate(datetime.strptime('2015-12-24', "%Y-%m-%d"))
         #QtCore.QDate.fromString('2015-12-24', QtCore.Qt.ISODate).toString(QtCore.Qt.ISODate)
@@ -255,7 +246,7 @@ class MyTableView(QtGui.QWidget):
 
 
 def main():
-
+    
     app = QtGui.QApplication(sys.argv)
     a = MyTableView()
     sys.exit(app.exec_())
