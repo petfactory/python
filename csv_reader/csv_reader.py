@@ -62,6 +62,15 @@ class MyModel(QtCore.QAbstractTableModel):
         '''Retur the number of columns'''
         return 5
 
+    def getAmount(self, row):
+            return self._items[row].amount
+
+    def getTransaction(self, row):
+            return self._items[row].transaction
+
+    def getDate(self, row):
+            return self._items[row].date
+
     def data( self, index, role= QtCore.Qt.DisplayRole):
         '''Return the display name of the PyNode from the item at the given index.'''
         if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
@@ -151,9 +160,9 @@ class MyTableView(QtGui.QWidget):
     def __init__(self):
         super(MyTableView, self).__init__()
 
-        self.setGeometry(0, 50, 500, 300)
+        self.setGeometry(0, 50, 700, 500)
         self.setWindowTitle('Tableview')
-        main_vbox = QtGui.QHBoxLayout(self)
+        main_vbox = QtGui.QVBoxLayout(self)
 
         self.tableview = QtGui.QTableView()
         self.tableview.setAlternatingRowColors(True)
@@ -178,7 +187,52 @@ class MyTableView(QtGui.QWidget):
         self.tableview.resizeColumnsToContents()
         self.tableview.horizontalHeader().setStretchLastSection(True)
 
+        self.search_lineedit = QtGui.QLineEdit()
+        main_vbox.addWidget(self.search_lineedit)
+
+        search_button = QtGui.QPushButton('Search')
+        search_button.clicked.connect(self.search_button_clicked)
+        main_vbox.addWidget(search_button)
+
         self.show()
+
+    def search_button_clicked(self):
+
+        text = self.search_lineedit.text()
+        self.search(search_list=text.split(','))
+
+    def search(self, search_list=None, year=None, month=None, day=None):
+
+        ret_dict = {}
+
+        for label in search_list:
+            ret_dict[label] = []
+
+        rows = self.model.rowCount()
+
+        match_rows = []
+        for row in range(rows):
+
+            date = self.model.getDate(row)
+
+            if search_list:
+
+                trans = self.model.getTransaction(row)
+
+                #if any(x.lower() in trans.lower() for x in search_list):
+                for label in search_list:
+
+                    if label.lower() in trans.lower():
+                        ret_dict[label].append([date.toString(QtCore.Qt.ISODate), trans, self.model.getAmount(row)])
+
+                        #print(trans.encode('utf-8'))
+                    #match_rows.append([date.toString(QtCore.Qt.ISODate), trans])
+                    #print(trans.encode('utf-8'))
+                    
+
+        #pprint.pprint(match_rows)
+        pprint.pprint(ret_dict)
+
 
     def get_csv_file(self, path):
 
