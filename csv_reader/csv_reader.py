@@ -1,161 +1,220 @@
 # -*- coding: utf-8 -*-
-
 import os, sys, pprint
-import csv
-
+from datetime import datetime
 from PySide import QtGui, QtCore
+import locale, csv
 
-def build(path):
 
-    if not os.path.isfile(path):
-        print('Not a valid file')
-        return
+class Item(object):
 
-    row_list = []
-    header_list = []
-    with open(path, 'rb') as csvfile:
-        spamreader = csv.reader(csvfile)
+    def __init__(self, datestring, transaction, category, amount, balance):
 
-        for index, row in enumerate(spamreader):
-            
-            if index == 0:
-                header_list.extend(row)
-            else:
-                row_list.append(row)
+        #locale.setlocale(locale.LC_ALL, "es_ES")
+        #locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
-    return (header_list, row_list)
+        self.date = QtCore.QDate.fromString(datestring, QtCore.Qt.ISODate)
+        self.transaction = transaction.decode('utf-8')
+        self.category = category.decode('utf-8')
 
-class MyDelegate(QtGui.QItemDelegate):
-    
-    def __init__(self, parent=None):
-        super(MyDelegate, self).__init__(parent)
-        
-    def createEditor(self, parent, option, index):
-        
+        # check for empty string
+        #self.amount = locale.atof(amount) if amount else  0
+        #self.balance = locale.atof(balance) if balance else  0
+
+        # need to get back to using locale...
+        if amount:
+            amount = amount.replace(".", "")
+            amount = amount.replace(",", ".")
+            self.amount = float(amount)
+
+        else: self.amount = 0
+
+        if balance:
+            balance = balance.replace(".", "")
+            balance = balance.replace(",", ".")
+            self.balance = float(balance)
+
+        else: self.balance = 0
+
+
+        #QtCore.QDate(datetime.strptime('2015-12-24', "%Y-%m-%d"))
+        #QtCore.QDate.fromString('2015-12-24', QtCore.Qt.ISODate).toString(QtCore.Qt.ISODate)
+        #QtCore.QDate.fromString(self._items[row][col], QtCore.Qt.ISODate).toString(QtCore.Qt.ISODate)
+        #QtCore.QDate.fromString(self._items[row][col], QtCore.Qt.ISODate)
+
+class MyModel(QtCore.QAbstractTableModel):
+
+    def __init__(self, items, headers):
+        '''Instantiates the model with a root item.'''
+        super(MyModel, self).__init__()
+        self._items = items
+        self.headers = headers
+
+    # Mandatory method implementations ---------------------------
+
+    # the following 3 methods (rowCount(...), columnCount(...), data(...)) must be implemented
+    # default implementation of index(...), parent(...) are provided by the QAbstractTableModel class
+    # Well behaved models will also implement headerData(...)
+    def rowCount(self, index=QtCore.QModelIndex()):
+        '''Returns the number of children for the given QModelIndex.'''
+        return len(self._items)
+
+    def columnCount( self, index=QtCore.QModelIndex()):
+        '''Retur the number of columns'''
+        return 5
+
+    def data( self, index, role= QtCore.Qt.DisplayRole):
+        '''Return the display name of the PyNode from the item at the given index.'''
+        if role == QtCore.Qt.DisplayRole or role == QtCore.Qt.EditRole:
+
+            row = index.row()
+            col = index.column()
+
+            if col == 0:
+                #print(self._items[row].date.year())
+                return self._items[row].date
+
+            elif col == 1:
+                return self._items[row].transaction
+
+            elif col == 2:
+                return self._items[row].category
+
+            elif col == 3:
+                return self._items[row].amount
+
+            elif col == 4:
+                return self._items[row].balance
+
+
+    # optional method implementations ---------------------------
+    def flags( self, index ):
+        '''Valid items are selectable, editable, and drag and drop enabled. Invalid indices (open space in the view)
+        are also drop enabled, so you can drop items onto the top level.
+        '''
         col = index.column()
-        
-        if col == 0:
 
-            #spinbox = QtGui.QDoubleSpinBox(parent)
-            spinbox = QtGui.QDateEdit(parent)
-            #spinbox.setRange(-99999, 99999)
-            spinbox.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
-            return spinbox
-        
+        if not index.isValid():
+            return QtCore.Qt.ItemIsEnabled
+
         else:
-            return QtGui.QLineEdit(parent)
+            return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled |  QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
+            #return QtCore.Qt.ItemIsEnabled |  QtCore.Qt.ItemIsSelectable
+            '''
+            if col == 0:
+                return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsDragEnabled |  QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
+            else:
+                return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDropEnabled | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable
+            '''
+    
+    def setData(self, index, value, role=QtCore.Qt.EditRole):
+    
+        if role == QtCore.Qt.EditRole:
+            
+            row = index.row()
+            col = index.column()
 
-class CSVReader(QtGui.QWidget):
+            if col == 0:
+                self._items[row].date = value
+            elif col == 1:
+                self._items[row].transaction = value
+            elif col == 2:
+                self._items[row].category = value
+            elif col == 3:
+                self._items[row].amount = value
+            elif col == 4:
+                self._items[row].balance = value
+
+            self.dataChanged.emit(index, index)
+
+            return True
+
+        return False
+    
+    def append_item(self, item, parent=QtCore.QModelIndex()):
+        ''' this will append an item'''
+
+        position = self.rowCount()
+        self.beginInsertRows(QtCore.QModelIndex(), position, position)
+        self._items.insert(position, item)
+        self.endInsertRows()
+        return True
+
+    def headerData(self, col, orientation, role):
+        if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
+            return self.headers[col]
+        return None
+
+
+
+class MyTableView(QtGui.QWidget):
 
     def __init__(self):
-        super(CSVReader, self).__init__()
+        super(MyTableView, self).__init__()
 
-        outer_vbox = QtGui.QVBoxLayout(self)
-        outer_vbox.setContentsMargins(0,0,0,0)
-        self.row_list = None
+        self.setGeometry(0, 50, 500, 300)
+        self.setWindowTitle('Tableview')
+        main_vbox = QtGui.QHBoxLayout(self)
 
-        menubar = QtGui.QMenuBar()
-        outer_vbox.addWidget(menubar)
-        menubar.setNativeMenuBar(False)
-
-        file_menu = menubar.addMenu('File')
-
-        load_action = QtGui.QAction('Load', self)
-        load_action.triggered.connect(self.load_btn_clicked)
-        file_menu.addAction(load_action)
-
-
-        main_hbox = QtGui.QHBoxLayout()
-        outer_vbox.addLayout(main_hbox)
-        main_hbox.setContentsMargins(7,7,7,7)
-        
-        # the main image viewer
-        main_vbox = QtGui.QVBoxLayout()
-        main_hbox.addLayout(main_vbox)
-
-        self.table_view = QtGui.QTableView()
-        main_vbox.addWidget(self.table_view)
-        self.table_view.setItemDelegate(MyDelegate(self.table_view))
+        self.tableview = QtGui.QTableView()
+        self.tableview.setAlternatingRowColors(True)
+        main_vbox.addWidget(self.tableview)
 
         path = r'/Users/johan/Desktop/export.csv'
-        header_list, row_list = build(path)
+        header_list, row_list = self.get_csv_file(path)
 
-        self.model = QtGui.QStandardItemModel()
-        self.model.setHorizontalHeaderLabels(header_list)
-        self.table_view.setModel(self.model)
+        self.model = MyModel([], header_list)
+        self.tableview.setModel(self.model)
 
-        self.add_items(row_list)
+        for row_data in row_list:
 
-        self.setGeometry(0, 50, 400, 400)
-        self.setWindowTitle('CSV Reader')
+            if len(row_data) != 5:
+                print('The row does not have length of 5')
+                continue
+            datestring, transaction, category, amount, balance = row_data
+            self.model.append_item(Item(datestring, transaction, category, amount, balance))
 
-        self.search_lineedit = QtGui.QLineEdit()
-        main_vbox.addWidget(self.search_lineedit)
+        #self.model.append_item(Item('2015-03-22', 'Ica', '', '-1,256.60', '1,231.21'))
 
-        search_button = QtGui.QPushButton('Search')
-        search_button.clicked.connect(self.search_button_clicked)
-        main_vbox.addWidget(search_button)
-
-        
+        self.tableview.resizeColumnsToContents()
+        self.tableview.horizontalHeader().setStretchLastSection(True)
 
         self.show()
 
-    def search_button_clicked(self):
+    def get_csv_file(self, path):
 
-        text = self.search_lineedit.text()
-        self.search(string=text)
+        if not os.path.isfile(path):
+            print('Not a valid file')
+            return
 
-    def search(self, string=None, year=None, month=None, day=None):
+        row_list = []
+        header_list = []
+        with open(path, 'rb') as csvfile:
+            spamreader = csv.reader(csvfile)
 
-        rows = self.model.rowCount()
-
-        match_rows = []
-        for row in range(rows):
-            item = self.model.item(row, 0)
-            date = item.text()
-            date_split = date.split('-')
-
-            if string:
-
-                transaction = self.model.item(row, 1).text()
-
-                if string in transaction.lower():
-                    date = self.model.item(row, 0).text()
-                    belopp = self.model.item(row, 3).text()
-                    saldo = self.model.item(row, 4).text()
-                    match_rows.append([date, transaction, '', belopp, saldo])
-                    #print(trans.encode('utf-8'))
-                    
-
-        pprint.pprint(match_rows)
-
-
-    def add_items(self, row_list):
-
-        self.row_list = row_list
-
-        for row, row_data in enumerate(row_list):
-
-            for col, col_data in enumerate(row_data):
-
-                if col > 2:
-
-                    item = QtGui.QStandardItem(col_data.decode('utf8'))
-
+            for index, row in enumerate(spamreader):
+                
+                if index == 0:
+                    header_list.extend(row)
                 else:
-                    item = QtGui.QStandardItem(col_data.decode('utf8'))
+                    row_list.append(row)
 
-                item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
-                self.model.setItem(row, col, item)
+        return (header_list, row_list)
 
-        
-    def load_btn_clicked(self):
-        print(self.sender())
 
 def main():
+    
+    #locale.setlocale(locale.LC_NUMERIC, 'sv_SE')
+
+    #print(locale.THOUSEP)
+
+    #print(locale.atof('1.000.1000,55'))
+
+    #return
+    #a =  '-1.000.000,23'.replace(".", "")
+    #print a.replace(",", ".")
 
     app = QtGui.QApplication(sys.argv)
-    csv_reader = CSVReader()
+    a = MyTableView()
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
