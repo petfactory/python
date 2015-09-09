@@ -168,7 +168,7 @@ class MyTableView(QtGui.QWidget):
         self.tableview.setAlternatingRowColors(True)
         main_vbox.addWidget(self.tableview)
 
-        path = r'/Users/johan/Desktop/export.csv'
+        path = r'example.csv'
         header_list, row_list = self.get_csv_file(path)
 
         self.model = MyModel([], header_list)
@@ -206,7 +206,7 @@ class MyTableView(QtGui.QWidget):
         ret_dict = {}
 
         for label in search_list:
-            ret_dict[label] = []
+            ret_dict[label.strip()] = []
 
         rows = self.model.rowCount()
 
@@ -219,18 +219,12 @@ class MyTableView(QtGui.QWidget):
 
                 trans = self.model.getTransaction(row)
 
-                #if any(x.lower() in trans.lower() for x in search_list):
                 for label in search_list:
 
-                    if label.lower() in trans.lower():
-                        ret_dict[label].append([date.toString(QtCore.Qt.ISODate), trans, self.model.getAmount(row)])
+                    l = label.strip()
+                    if l.lower() in trans.lower():
+                        ret_dict[l].append([row, date.toString(QtCore.Qt.ISODate), trans, self.model.getAmount(row)])
 
-                        #print(trans.encode('utf-8'))
-                    #match_rows.append([date.toString(QtCore.Qt.ISODate), trans])
-                    #print(trans.encode('utf-8'))
-                    
-
-        #pprint.pprint(match_rows)
         pprint.pprint(ret_dict)
 
 
@@ -256,16 +250,6 @@ class MyTableView(QtGui.QWidget):
 
 
 def main():
-    
-    #locale.setlocale(locale.LC_NUMERIC, 'sv_SE')
-
-    #print(locale.THOUSEP)
-
-    #print(locale.atof('1.000.1000,55'))
-
-    #return
-    #a =  '-1.000.000,23'.replace(".", "")
-    #print a.replace(",", ".")
 
     app = QtGui.QApplication(sys.argv)
     a = MyTableView()
