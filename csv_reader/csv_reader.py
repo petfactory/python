@@ -35,12 +35,9 @@ class MyTableView(QtGui.QWidget):
 
     def load_data(self, path):
 
-        #path = r'/Users/johan/Desktop/export.csv'
         header_list, row_list = self.get_csv_file(path)
 
-        self.model = tableviewModel.MyModel([], header_list)
-        self.tableview.setModel(self.model)
-
+        item_list = []
         for row_data in row_list:
 
             if len(row_data) != 5:
@@ -48,7 +45,10 @@ class MyTableView(QtGui.QWidget):
                 continue
 
             datestring, transaction, category, amount, balance = row_data
-            self.model.append_item(tableviewModel.Item(datestring, transaction, category, amount, balance))
+            item_list.append(tableviewModel.Item(datestring, transaction, category, amount, balance))
+
+        self.model = tableviewModel.MyModel(item_list, header_list)
+        self.tableview.setModel(self.model)
 
 
     def search_button_clicked(self):
