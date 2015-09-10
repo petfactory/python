@@ -16,7 +16,7 @@ class MyTableView(QtGui.QWidget):
 
         self.result_canvas = None
         self.tableview = QtGui.QTableView()
-        self.tableview.setAlternatingRowColors(True)
+        #self.tableview.setAlternatingRowColors(True)
         main_vbox.addWidget(self.tableview)
 
         #self.model.append_item(Item('2015-03-22', 'Ica', '', '-1,256.60', '1,231.21'))
@@ -134,6 +134,7 @@ class MyTableView(QtGui.QWidget):
 
         #info_list = [[100, 100, 100], [100, 200, 100], [100, 200, 300], [50,50,400], [100, 100, 100], [100, 200, 100]]
 
+        x, y = 0,0
         self.result_canvas = resultCanvas.MyResultCanvas((x+50, y+50), result_list, search_label_stripped)
         self.result_canvas.show()
 
@@ -164,7 +165,7 @@ def main():
     w = MyTableView()
     #w.load_data('example2.csv')
     w.load_data('/Users/johan/Desktop/export.csv')
-    w.search(search_list=['coop', 'ica'])
+    #w.search(search_list=['coop', 'ica'])
     sys.exit(app.exec_())
 
 if __name__ == '__main__':

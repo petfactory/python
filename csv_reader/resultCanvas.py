@@ -8,7 +8,7 @@ class MyResultCanvas(QtGui.QWidget):
     def __init__(self, pos, result_list=[], search_labels=[], parent=None):
         super(MyResultCanvas, self).__init__(parent)
 
-        self.col_list = [QtCore.Qt.red, QtCore.Qt.white, QtGui.QColor(70, 90, 120)] 
+        self.col_list = [QtGui.QColor(118, 165, 208), QtGui.QColor(172, 185, 60), QtGui.QColor(231, 109, 67)] 
         self.result_list = result_list
         self.search_labels = search_labels
         self.text_spacing = 20
@@ -22,7 +22,7 @@ class MyResultCanvas(QtGui.QWidget):
         self.chart_spacing = 10
         self.width = self.chart_width * self.num_month + self.chart_spacing * (self.num_month-1) + self.chart_offset_edge_x*2
         self.height = 400
-        self.height_scale = .3
+        self.height_scale = .1
 
         print(self.width, self.height)
 
@@ -64,6 +64,7 @@ class MyResultCanvas(QtGui.QWidget):
                 month_total_x = x = self.chart_offset_edge_x + (self.chart_width + self.chart_spacing) * index
 
                 qp.setPen(self.chart_line_color)
+                qp.drawLine(self.chart_spacing*.5, self.chart_base_y, self.width-self.chart_spacing*.5, self.chart_base_y)
                 qp.drawLine(x-self.chart_spacing*.5, self.chart_spacing*.5, x-self.chart_spacing*.5, self.height-self.chart_spacing*.5)
 
                 if not data_list:
