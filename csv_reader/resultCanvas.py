@@ -67,8 +67,12 @@ class MyResultCanvas(QtGui.QWidget):
                 qp.drawLine(self.chart_spacing*.5, self.chart_base_y, self.width-self.chart_spacing*.5, self.chart_base_y)
                 qp.drawLine(x-self.chart_spacing*.5, self.chart_spacing*.5, x-self.chart_spacing*.5, self.height-self.chart_spacing*.5)
 
+                color = self.col_list[color_index]
+                color_index += 1
+
                 if not data_list:
                     print('Could not get the data: {}'.format(key.encode('utf-8')))
+
                     continue
 
                 total = 0
@@ -76,11 +80,11 @@ class MyResultCanvas(QtGui.QWidget):
                     total += data[3]
 
                 #print('{} Total:{}'.format(key, total))
-                qp.setPen(self.col_list[color_index])
+                qp.setPen(color)
 
                 
                 v = total * self.height_scale
-                qp.fillRect(x, y, self.chart_width, v, self.col_list[color_index])
+                qp.fillRect(x, y, self.chart_width, v, color)
                 y += v
 
                 text_y += self.text_spacing
@@ -88,7 +92,7 @@ class MyResultCanvas(QtGui.QWidget):
                 qp.setFont(QtGui.QFont('Decorative', 16))
                 qp.drawText(x, text_y, str(total))
 
-                color_index += 1
+                
                 
                 month_total += total
                 #print(total)
