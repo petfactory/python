@@ -25,13 +25,33 @@ class MyTableView(QtGui.QWidget):
         self.tableview.horizontalHeader().setStretchLastSection(True)
 
         self.search_lineedit = QtGui.QLineEdit()
+        self.search_lineedit.installEventFilter(self)
         main_vbox.addWidget(self.search_lineedit)
 
         search_button = QtGui.QPushButton('Search')
         search_button.clicked.connect(self.search_button_clicked)
         main_vbox.addWidget(search_button)
 
+
+
         self.show()
+
+    def eventFilter(self, widget, event):
+
+        if (event.type() == QtCore.QEvent.KeyPress and widget is self.search_lineedit):
+
+            key = event.key()
+
+            if key == QtCore.Qt.Key_Return:
+                #print('return')
+                self.search_button_clicked()
+                return True
+            else:
+                return False
+
+        #return QtGui.QWidget.eventFilter(self, widget, event)
+        return False
+
 
     def load_data(self, path):
 
