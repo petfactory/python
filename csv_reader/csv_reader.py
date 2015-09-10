@@ -35,7 +35,13 @@ class MyTableView(QtGui.QWidget):
 
     def load_data(self, path):
 
-        header_list, row_list = self.get_csv_file(path)
+        load_data = self.get_csv_file(path)
+
+        if not load_data:
+            return
+
+        header_list, row_list = load_data
+
 
         item_list = []
         for row_data in row_list:
@@ -58,13 +64,20 @@ class MyTableView(QtGui.QWidget):
 
     def search(self, search_list=None, year=None, month=None, day=None):
 
-        ret_dict = {}
+        # the dict containing all matches
+        match_dict = {}
 
+        # Initaiate the dict, strip away the white space for the keys and add empty list as value
+        search_label_stripped = []
         for label in search_list:
-            ret_dict[label.strip()] = []
+            l = label.strip()
+            search_label_stripped.append(l)
+            match_dict[l] = []
+
 
         rows = self.model.rowCount()
 
+        # loop through the rows
         match_rows = []
         for row in range(rows):
 
@@ -72,29 +85,63 @@ class MyTableView(QtGui.QWidget):
 
             if search_list:
 
+                # get the transaction string
                 trans = self.model.getTransaction(row)
 
+                # loop through all the individual strings in the search list
                 for label in search_list:
 
+                    # remove the white space and convert to lower and see if the label string is present
+                    # the transaction string, if it is append to the ret dict under corresponding key
                     l = label.strip()
                     if l.lower() in trans.lower():
-                        ret_dict[l].append([row, date.toString(QtCore.Qt.ISODate), trans, self.model.getAmount(row)])
+                        #ret_dict[l].append([row, date.toString(QtCore.Qt.ISODate), trans, self.model.getAmount(row)])
+                        match_dict[l].append([row, date, trans, self.model.getAmount(row)])
 
-        pprint.pprint(ret_dict)
+        #pprint.pprint(ret_dict)
+        num_months = 12
 
+        # build the result list that has the length of the num_monts, and that contains a dict with the search strings, which in
+        # trun has a list of the transactions that occured during respective month
+        # [ {'coop':[]
+        #    'ica':[]},
+        #   {'coop':[]
+        #    'ica':[]}...]
+
+        result_list = []
+        for i in range(num_months):
+            d = {}
+
+            for key in match_dict.keys():
+                d[key] = []
+
+            result_list.append(d)
+
+        
+        # llop through the match_dict and place the data in the result list by month, and in 
+        # each month list in the correct dictionary based on the label
+        for label, data_list in match_dict.iteritems():
+
+            for data in data_list:
+
+                month_index = data[1].month()-1
+                result_list[month_index][label].append(data)
+
+
+        #pprint.pprint(result_list)
         # show the result canvas
         x, y = self.pos().toTuple()
 
-        info_list = [[100, 100, 100], [100, 200, 100], [100, 200, 300], [50,50,400], [100, 100, 100], [100, 200, 100]]
+        #info_list = [[100, 100, 100], [100, 200, 100], [100, 200, 300], [50,50,400], [100, 100, 100], [100, 200, 100]]
 
-        self.result_canvas = resultCanvas.MyResultCanvas((x+50, y+50), info_list)
+        self.result_canvas = resultCanvas.MyResultCanvas((x+50, y+50), result_list, search_label_stripped)
         self.result_canvas.show()
 
     def get_csv_file(self, path):
 
         if not os.path.isfile(path):
             print('Not a valid file')
-            return
+            return None
 
         row_list = []
         header_list = []
@@ -114,8 +161,10 @@ class MyTableView(QtGui.QWidget):
 def main():
     
     app = QtGui.QApplication(sys.argv)
-    a = MyTableView()
-    a.load_data('example.csv')
+    w = MyTableView()
+    #w.load_data('example2.csv')
+    w.load_data('/Users/johan/Desktop/export.csv')
+    w.search(search_list=['coop', 'ica'])
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
