@@ -8,12 +8,21 @@ class MyResultCanvas(QtGui.QWidget):
     def __init__(self, pos, result_list=[], search_labels=[], parent=None):
         super(MyResultCanvas, self).__init__(parent)
 
-        self.col_list = [QtGui.QColor(118, 165, 208), QtGui.QColor(172, 185, 60), QtGui.QColor(231, 109, 67)] 
+        MyResultCanvas.col_list = [ QtGui.QColor(118, 165, 208),
+                                    QtGui.QColor(172, 185, 60),
+                                    QtGui.QColor(231, 109, 67),
+                                    QtGui.QColor(246, 197, 26),
+                                    QtGui.QColor(127, 210, 135)]
+
+        MyResultCanvas.month_names = ('jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sept', 'okt', 'now', 'dec')
+
+
         self.result_list = result_list
         self.search_labels = search_labels
         self.text_spacing = 20
         self.text_offset = 20
         self.chart_line_color = QtGui.QColor(200, 200, 200)
+        self.month_name_y = 20
 
         self.chart_base_y = 300
         self.chart_width = 90
@@ -67,7 +76,12 @@ class MyResultCanvas(QtGui.QWidget):
                 qp.drawLine(self.chart_spacing*.5, self.chart_base_y, self.width-self.chart_spacing*.5, self.chart_base_y)
                 qp.drawLine(x-self.chart_spacing*.5, self.chart_spacing*.5, x-self.chart_spacing*.5, self.height-self.chart_spacing*.5)
 
-                color = self.col_list[color_index]
+                qp.setFont(QtGui.QFont('Decorative', 16))
+                qp.drawText(month_total_x, self.month_name_y, MyResultCanvas.month_names[index])
+
+                
+
+                color = MyResultCanvas.col_list[color_index]
                 color_index += 1
 
                 if not data_list:
