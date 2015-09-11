@@ -12,7 +12,24 @@ class MyTableView(QtGui.QWidget):
 
         self.setGeometry(0, 50, 700, 500)
         self.setWindowTitle('Tableview')
-        main_vbox = QtGui.QVBoxLayout(self)
+
+        outer_vbox = QtGui.QVBoxLayout(self)
+        outer_vbox.setContentsMargins(0,0,0,0)
+
+        menubar = QtGui.QMenuBar()
+        outer_vbox.addWidget(menubar)
+        menubar.setNativeMenuBar(False)
+
+        file_menu = menubar.addMenu('File')
+
+        load_action = QtGui.QAction('Load csv file', self)
+        load_action.triggered.connect(self.load_btn_clicked)
+        file_menu.addAction(load_action)
+
+
+        main_vbox = QtGui.QVBoxLayout()
+        outer_vbox.addLayout(main_vbox)
+        main_vbox.setContentsMargins(7,7,7,7)
 
         self.result_canvas = None
         self.tableview = QtGui.QTableView()
@@ -20,6 +37,8 @@ class MyTableView(QtGui.QWidget):
         main_vbox.addWidget(self.tableview)
 
         #self.model.append_item(Item('2015-03-22', 'Ica', '', '-1,256.60', '1,231.21'))
+
+        self.model = None
 
         self.tableview.resizeColumnsToContents()
         self.tableview.horizontalHeader().setStretchLastSection(True)
@@ -35,6 +54,15 @@ class MyTableView(QtGui.QWidget):
 
 
         self.show()
+
+    def load_btn_clicked(self):
+
+        file_name, selected_filter = QtGui.QFileDialog.getOpenFileName(None, 'Load csv file', None, filter='CSV (*.csv)')
+
+        if file_name:
+
+            self.load_data(file_name)
+
 
     def eventFilter(self, widget, event):
 
@@ -73,6 +101,8 @@ class MyTableView(QtGui.QWidget):
             datestring, transaction, category, amount, balance = row_data
             item_list.append(tableviewModel.Item(datestring, transaction, category, amount, balance))
 
+        #print(self.model)
+        # maybe should reuse the model instead of creating a new one...
         self.model = tableviewModel.MyModel(item_list, header_list)
         self.tableview.setModel(self.model)
 
@@ -184,7 +214,7 @@ def main():
     app = QtGui.QApplication(sys.argv)
     w = MyTableView()
     #w.load_data('example2.csv')
-    w.load_data('/Users/johan/Desktop/export.csv')
+    #w.load_data('/Users/johan/Desktop/export.csv')
     #w.search(search_list=['coop', 'ica'])
     sys.exit(app.exec_())
 
