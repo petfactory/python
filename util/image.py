@@ -32,35 +32,24 @@ def thumbnail(source_dir, width, height, thumb_format='jpeg'):
 
 #thumbnail('/Users/johan/Desktop/pics', 128, 128)
 
-def appicon(source_image, dest_dir):
+def appicon(source_image, dest_dir, size_dict):
 
     if not os.path.isdir(dest_dir):
         print('the directory does not exist')
         return
 
+    name = size_dict.get('name')
+    size_dict = size_dict.get('sizes')
+
     dt = datetime.datetime.today()
     dtstring =  dt.strftime("%Y-%m-%d %H-%M-%S")
 
-    dest_dir = os.path.join(dest_dir, 'appicons_{}'.format(dtstring))
+    dest_dir = os.path.join(dest_dir, '{}_{}'.format(name, dtstring))
     os.makedirs(dest_dir)
 
     img_name, file_ext = os.path.splitext(source_image)
     if file_ext not in ('.jpg', '.jpeg', '.png'):
         return
-
-
-    size_dict = {   'icon_512x512@2x':1024,
-                    'icon_512x512':512,
-                    'icon_256x256@2x':512,
-                    'icon_256x256':256,
-                    'icon_128x128@2x':256,
-                    'icon_128x128':128,
-
-                    'icon_32x32@2x':64,
-                    'icon_32x32':32,
-                    'icon_16x16@2x':32,
-                    'icon_16x16':16
-    }
 
     for name, size in size_dict.iteritems():
 
@@ -70,6 +59,34 @@ def appicon(source_image, dest_dir):
         img.format = 'png'
         img.save(filename=os.path.join(dest_dir, '{}.png'.format(name)))
 
+size_dict_mac = {   'name':'mac',
+                    'sizes':{   'icon_512x512@2x':1024,
+                                'icon_512x512':512,
+                                'icon_256x256@2x':512,
+                                'icon_256x256':256,
+                                'icon_128x128@2x':256,
+                                'icon_128x128':128,
 
-appicon(source_image='/Users/johan/Desktop/appicon/instagram.png', dest_dir='/Users/johan/Desktop/appicon')
+                                'icon_32x32@2x':64,
+                                'icon_32x32':32,
+                                'icon_16x16@2x':32,
+                                'icon_16x16':16
+                            }
+                }
+
+size_dict_iphone = {   'name':'iphone',
+                        'sizes':{   '29pt@2x':58,
+                                    '29pt@3x':87,
+                                    '40pt@2x':80,
+                                    '40pt@3x':120,
+                                    '60pt@2x':120,
+                                    '60pt@3x':180,
+
+                            }
+                }
+
+
+appicon(source_image='/Users/johan/Desktop/mmmPuss/mmmPuss.png',
+        dest_dir='/Users/johan/Desktop/mmmPuss',
+        size_dict = size_dict_iphone)
 

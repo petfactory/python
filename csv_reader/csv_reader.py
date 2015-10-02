@@ -121,8 +121,10 @@ class MyTableView(QtGui.QWidget):
         search_label_stripped = []
         for label in search_list:
             l = label.strip()
-            search_label_stripped.append(l)
-            match_dict[l] = []
+
+            if l not in search_label_stripped:
+                search_label_stripped.append(l)
+                match_dict[l] = []
 
 
         rows = self.model.rowCount()
@@ -131,6 +133,7 @@ class MyTableView(QtGui.QWidget):
         match_rows = []
         for row in range(rows):
 
+            print(row)
             date = self.model.getDate(row)
 
             if search_list:
@@ -147,8 +150,12 @@ class MyTableView(QtGui.QWidget):
                     if l.lower() in trans.lower():
                         #ret_dict[l].append([row, date.toString(QtCore.Qt.ISODate), trans, self.model.getAmount(row)])
                         match_dict[l].append([row, date, trans, self.model.getAmount(row)])
+                        break
+                        
 
-        #pprint.pprint(ret_dict)
+        pprint.pprint(match_dict)
+
+
         num_months = 12
 
         # build the result list that has the length of the num_monts, and that contains a dict with the search strings, which in
@@ -179,14 +186,16 @@ class MyTableView(QtGui.QWidget):
 
 
         #pprint.pprint(result_list)
-        # show the result canvas
-        x, y = self.pos().toTuple()
 
-        #info_list = [[100, 100, 100], [100, 200, 100], [100, 200, 300], [50,50,400], [100, 100, 100], [100, 200, 100]]
+        if self.result_canvas is None:
+            x, y = self.pos().toTuple()
+            self.result_canvas = resultCanvas.MyResultCanvas((x+50, y+50), result_list, search_label_stripped)
+            self.result_canvas.show()
 
-        x, y = 0,0
-        self.result_canvas = resultCanvas.MyResultCanvas((x+50, y+50), result_list, search_label_stripped)
-        self.result_canvas.show()
+        else:
+            self.result_canvas.redraw(result_list, search_label_stripped)
+            self.result_canvas.show()
+
 
     def get_csv_file(self, path):
 
@@ -214,8 +223,8 @@ def main():
     app = QtGui.QApplication(sys.argv)
     w = MyTableView()
     #w.load_data('example2.csv')
-    #w.load_data('/Users/johan/Desktop/export.csv')
-    #w.search(search_list=['coop', 'ica'])
+    w.load_data('/Users/johan/Desktop/export_oneline.csv')
+    #w.search(search_list=['a', 'b', 'c'])
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
