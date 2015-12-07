@@ -86,7 +86,7 @@ size_dict_iphone = {   'name':'iphone',
                 }
 
 
-appicon(source_image='/Users/johan/Desktop/mmmPuss/mmmPuss.png',
-        dest_dir='/Users/johan/Desktop/mmmPuss',
+appicon(source_image='/Users/johan/Desktop/splat/splat.png',
+        dest_dir='/Users/johan/Desktop/splat',
         size_dict = size_dict_iphone)
 
