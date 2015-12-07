@@ -4,15 +4,24 @@ import sys, os
 import re
 
 
-def get_files(path, pattern):
+def createFiles(dirPath, name, ext, start, end):
 
-	dirCont = os.listdir(path)
+	for i in range(start, end+1):
+		fileName = '{0}.{1:03d}.{2}'.format(name, i, ext)
+		file = open(os.path.join(dirPath, fileName), "w")
+		file.close()
+		#print(fileName)
+
+
+def get_files(dirPath, pattern):
+
+	dirCont = os.listdir(dirPath)
 	min = max = inc = 0
 	frameNumList = []
 	matchList = []
 	for index, cont in enumerate(dirCont):
 		
-		if os.path.isfile(os.path.join(path, cont)):
+		if os.path.isfile(os.path.join(dirPath, cont)):
 
 			match = pattern.match(cont)
 
@@ -56,7 +65,21 @@ def get_files(path, pattern):
 
 
 
+dirPath = '/Users/johan/Desktop/testDir'
+name = 'robot_lighting'
+ext = 'png'
 
-path = '/Users/johan/Desktop/test'
-pattern = re.compile('^test_([\d]*).png$')
-get_files(path, pattern)
+# create some dummy files
+createFiles(dirPath, name, ext, start=1, end=10)
+createFiles(dirPath, name, ext, start=15, end=20)
+
+
+# search for missing files
+pattern = re.compile('^robot_lighting.([\d]*).png$')
+get_files(dirPath, pattern)
+
+
+
+
+
+
