@@ -1,16 +1,17 @@
 <?xml version="1.0" ?>
-<root>
-	<node name="Level 1 A">
-		<node name="Level 2 A">
-			<node name="Level 3 A" />
-			<node name="Level 3 B" >
-				<node name="Level 4 A" />
+
+<root name="ROOT">
+		<node name="Level 1 A">
+			<node name="Level 2 A">
+				<node name="Level 3 A" />
+				<node name="Level 3 B" >
+					<node name="Level 4 A" />
+				</node>
+				<node name="Level 3 C" />
 			</node>
-			<node name="Level 3 C" />
+			<node name="Level 2 B" />
+			<node name="Level 2 C" />
 		</node>
-		<node name="Level 2 B" />
-		<node name="Level 2 C" />
-	</node>
-	<node name="Level 1 B" />
-	<node name="Level 1 C" />
+		<node name="Level 1 B" />
+		<node name="Level 1 C" />
 </root>

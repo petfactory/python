@@ -114,11 +114,20 @@ def inspect_dummy_scenegraph(node, depth=0):
     depth = depth -1
 
 
-create_default_scenegraph()
+def main():
+    
+    create_default_scenegraph()
+    root_node = create_dummy_scenegraph()
+    #print root_node
+    inspect_dummy_scenegraph(root_node)
 
-root_node = create_dummy_scenegraph()
-#print root_node
-inspect_dummy_scenegraph(root_node)
+
+if __name__ == '__main__':
+    main()
+
+
+
+
 
 
 
