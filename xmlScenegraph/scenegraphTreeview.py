@@ -40,14 +40,18 @@ class HierarchyTreeview(QtGui.QWidget):
  
         super(HierarchyTreeview, self).__init__(parent)
         self.setWindowFlags(QtCore.Qt.Tool)
-        
+        #self.hex_color_grey = '#dd0000'
+
         self.setGeometry(10, 50, 300, 400)
         self.setWindowTitle("TEST")
                 
         vbox = QtGui.QVBoxLayout(self)
+        vbox.setContentsMargins(0,0, 0, 0)
 
         # treeview
-        self.treeview = DeselectableTreeView()
+        self.treeview = QtGui.QTreeView() #DeselectableTreeView()
+        self.treeview.setAlternatingRowColors(True)
+
         vbox.addWidget(self.treeview)
         self.treeview.setHeaderHidden(True)
         self.treeview.setExpandsOnDoubleClick(False)
@@ -57,6 +61,30 @@ class HierarchyTreeview(QtGui.QWidget):
         self.treeview.setModel(self.model)
 
         self.populateModel()
+
+
+        self.treeview.setStyleSheet(
+        ''' QTreeView {
+                alternate-background-color: #AAAAAA;
+                background: #A2A2A2;
+                color: rgb(90, 90, 90);
+                selection-background-color: #555555;
+            }
+            QTreeView::item:focus {
+              background-color: #555555;
+              color: #ffcc00;
+            }
+
+            QTreeView::branch::closed::has-children {
+                image: url(branch_closed.png);
+            }
+
+            QTreeView::branch::open::has-children {
+                image: url(branch_open.png);
+            }
+        '''
+        )
+
 
 
     def cleanModel(self):
