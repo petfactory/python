@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from PySide import QtCore, QtGui
 import pprint
 import sys
@@ -48,11 +50,25 @@ class HierarchyTreeview(QtGui.QWidget):
         vbox = QtGui.QVBoxLayout(self)
         vbox.setContentsMargins(0,0, 0, 0)
 
+        # splitter
+        splitter = QtGui.QSplitter()
+        vbox.addWidget(splitter)
+
+
+        treeview_parent_widget = QtGui.QWidget()
+        treeview_vbox = QtGui.QVBoxLayout(treeview_parent_widget)
+
         # treeview
         self.treeview = QtGui.QTreeView() #DeselectableTreeView()
         self.treeview.setAlternatingRowColors(True)
+        treeview_vbox.addWidget(self.treeview)
 
-        vbox.addWidget(self.treeview)
+        refresh_button = QtGui.QPushButton('Refresh')
+        refresh_button.clicked.connect(self.refresh_button_clicked)
+
+        treeview_vbox.addWidget(refresh_button)
+        
+        splitter.addWidget(treeview_parent_widget)
         self.treeview.setHeaderHidden(True)
         self.treeview.setExpandsOnDoubleClick(False)
         
@@ -85,7 +101,38 @@ class HierarchyTreeview(QtGui.QWidget):
         '''
         )
 
+        button_widget = QtGui.QWidget()
+        self.button_vbox = QtGui.QVBoxLayout(button_widget)
 
+        splitter.addWidget(button_widget)
+        self.button_vbox.addStretch()
+
+        splitter.setSizes([500, 300])
+
+    def refresh_button_clicked(self):
+
+        for name in ['Level 2 A', 'Level 4 A', 'Level 1 B']:
+            self.add_button(name, self.button_vbox)
+
+    def add_button(self, name, layout):
+
+        path = None
+        for dag_path in self.dag_path_list:
+            if name in dag_path:
+                path = dag_path
+                break
+            #break
+
+        if path is None:
+            print 'Did not find name in hierarchy, skip to add button'
+            return
+
+        button = QtGui.QPushButton(name)
+        button.clicked.connect(partial(self.button_clicked, path))
+        layout.addWidget(button)
+
+    def button_clicked(self, name):
+        print name
 
     def cleanModel(self):
          numRows = self.model.rowCount()
@@ -124,10 +171,40 @@ class HierarchyTreeview(QtGui.QWidget):
         xml_tree = ET.parse(xmlPath)
         xml_root = xml_tree.getroot()
 
+
+        # recurse the treeview instead...
+        self.dag_path_list = []
+        full_dag_path_recurse(xml_root, self.dag_path_list)
+        #pprint.pprint(self.dag_path_list)
+
         self.cleanModel()
         root_item = self.model.invisibleRootItem()
 
         self.create_item_recurse(xml_root, root_item)
+
+
+def full_dag_path_recurse(xml_node, dag_path_list, parent_list=None):
+
+    if parent_list is None:
+        parent_list = []
+
+    name = xml_node.get('name')
+    parent_list.append(name)
+    full_path = ' | '.join(parent_list)
+    #print full_path
+
+    dag_path_list.append(full_path)
+
+    xml_children = xml_node.getchildren()
+
+    if xml_children:
+
+        for xml_child in xml_children:
+
+            full_dag_path_recurse(xml_child, dag_path_list, parent_list)
+
+    parent_list.pop()
+
 
 def main():
     
