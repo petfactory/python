@@ -41,7 +41,7 @@ class HierarchyTreeview(QtGui.QWidget):
 
         self.setWindowFlags(QtCore.Qt.Tool)
 
-        self.setGeometry(10, 50, 300, 400)
+        self.setGeometry(10, 50, 600, 400)
         self.setWindowTitle("TEST")
                 
         vbox = QtGui.QVBoxLayout(self)
@@ -74,7 +74,6 @@ class HierarchyTreeview(QtGui.QWidget):
 
         self.populateModel()
 
-
         self.treeview.setStyleSheet(
         ''' QTreeView {
                 alternate-background-color: #AAAAAA;
@@ -97,16 +96,65 @@ class HierarchyTreeview(QtGui.QWidget):
         '''
         )
 
+
+
+        self.setStyleSheet('''QPushButton {
+                                background-color: #AAAAAA;
+                                color: #222222;
+                                max-height: 20px;
+                                font: 11px;
+                                }
+
+                                QPushButton:pressed {
+                                background-color: #AAAAAA;
+                                color: #555555;
+                                max-height: 20px;
+                                font: 11px;
+                                }
+                                ''')
+
+
+
+
         button_widget = QtGui.QWidget()
-        self.button_vbox = QtGui.QVBoxLayout(button_widget)
+
+        button_main_vbox = QtGui.QVBoxLayout(button_widget)
+
+        self.button_vbox = QtGui.QVBoxLayout()
+        button_main_vbox.addLayout(self.button_vbox)
+        button_main_vbox.addStretch()
 
         splitter.addWidget(button_widget)
-        #self.button_vbox.addStretch()
+        splitter.setSizes([400, 200])
 
-        splitter.setSizes([500, 300])
 
     @staticmethod
-    def recurse_item(item, dag_path_dict, parent_list=None):
+    def get_item_recurse(item, dag_path_dict, parent_list=None):
+        '''Returns the dag_path_dict with the leaf item as key and the 
+        QStandardItem as value'''
+
+        if parent_list is None:
+            parent_list = []
+
+        name = item.text()
+        parent_list.append(str(name))
+
+        leaf_name = parent_list[-1] 
+        if leaf_name in dag_path_dict:
+            print 'Warning! "{}" is alreadey in dict'.format(leaf_name)
+
+        dag_path_dict[leaf_name] = item
+
+        num_rows = item.rowCount()
+        for row in range(num_rows):
+            child = item.child(row, 0)
+            HierarchyTreeview.get_item_recurse(child, dag_path_dict, parent_list)
+
+        parent_list.pop()
+
+
+    @staticmethod
+    def get_full_path_recurse(item, dag_path_dict, parent_list=None):
         '''Returns the dag_path_dict with the leaf item as key and the 
         full path (tuple) as value'''
 
@@ -125,7 +173,7 @@ class HierarchyTreeview(QtGui.QWidget):
         num_rows = item.rowCount()
         for row in range(num_rows):
             child = item.child(row, 0)
-            HierarchyTreeview.recurse_item(child, dag_path_dict, parent_list)
+            HierarchyTreeview.get_full_path_recurse(child, dag_path_dict, parent_list)
 
         parent_list.pop()
 
@@ -138,7 +186,8 @@ class HierarchyTreeview(QtGui.QWidget):
         # print them all.
         child = root_item.child(0, 0)
         self.dag_path_dict = {}
-        HierarchyTreeview.recurse_item(child, self.dag_path_dict)
+        HierarchyTreeview.get_item_recurse(child, self.dag_path_dict)
+        #HierarchyTreeview.get_full_path_recurse(child, self.dag_path_dict)
         #pprint.pprint(self.dag_path_dict)
 
         keys = self.dag_path_dict.keys()
@@ -148,20 +197,21 @@ class HierarchyTreeview(QtGui.QWidget):
 
         self.button_list = []
 
-        for name in ['Level 1 A', 'Level 1 B', 'Level 2 A', 'Level 4 A']:
+        for name in ['INT_DRIVER_SEAT', 'G__INT_DRIVER_SEAT', 'INT_PASSENGER_SEAT', 'G__INT_PASSENGER_SEAT']:
             if name in keys:
                 self.add_button(name, self.dag_path_dict[name], self.button_vbox)
 
 
-    def add_button(self, name, path_tuple, layout):
+    def add_button(self, name, item, layout):
 
         button = QtGui.QPushButton(name)
-        button.clicked.connect(partial(self.button_clicked, name, path_tuple))
+        button.clicked.connect(partial(self.button_clicked, name, item))
         layout.addWidget(button)
         self.button_list.append(button)
 
-    def button_clicked(self, name, path_tuple):
-        print (path_tuple, name)
+    def button_clicked(self, name, item):
+        #print (name, item)
+        self.treeview.setCurrentIndex(item.index())
 
     def cleanModel(self):
          numRows = self.model.rowCount()
