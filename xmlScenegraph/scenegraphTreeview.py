@@ -51,8 +51,8 @@ class HierarchyTreeview(QtGui.QWidget):
         splitter = QtGui.QSplitter()
         vbox.addWidget(splitter)
 
-        treeview_parent_widget = QtGui.QWidget()
-        treeview_vbox = QtGui.QVBoxLayout(treeview_parent_widget)
+        treeview_parent_frame = QtGui.QFrame()
+        treeview_vbox = QtGui.QVBoxLayout(treeview_parent_frame)
 
         # treeview
         self.treeview = QtGui.QTreeView() #DeselectableTreeView()
@@ -64,7 +64,7 @@ class HierarchyTreeview(QtGui.QWidget):
 
         treeview_vbox.addWidget(refresh_button)
         
-        splitter.addWidget(treeview_parent_widget)
+        splitter.addWidget(treeview_parent_frame)
         self.treeview.setHeaderHidden(True)
         self.treeview.setExpandsOnDoubleClick(False)
         
@@ -97,23 +97,35 @@ class HierarchyTreeview(QtGui.QWidget):
         )
 
 
+        self.setStyleSheet(
+        '''
+            QPushButton {
+                background-color: #AAAAAA;
+                color: #222222;
+                max-height: 20px;
+                font: 11px;
+            }
 
-        self.setStyleSheet('''QPushButton {
-                                background-color: #AAAAAA;
-                                color: #222222;
-                                max-height: 20px;
-                                font: 11px;
-                                }
+            QPushButton:pressed {
+                background-color: #AAAAAA;
+                color: #555555;
+                max-height: 20px;
+                font: 11px;
+            }
 
-                                QPushButton:pressed {
-                                background-color: #AAAAAA;
-                                color: #555555;
-                                max-height: 20px;
-                                font: 11px;
-                                }
-                                ''')
+            QFrame {
+                background-color: #888888;
+            }
 
+            QSplitter::handle {
+                image: url(branch_open.png);
+            }
 
+            QSplitter::handle:pressed {
+                image: url(branch_closed.png);
+            }
+            '''
+        )
 
 
         button_widget = QtGui.QWidget()
