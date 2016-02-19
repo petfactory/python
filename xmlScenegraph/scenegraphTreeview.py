@@ -56,13 +56,21 @@ class HierarchyTreeview(QtGui.QWidget):
 
         # treeview
         self.treeview = QtGui.QTreeView() #DeselectableTreeView()
+        self.treeview.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
         self.treeview.setAlternatingRowColors(True)
         treeview_vbox.addWidget(self.treeview)
 
         refresh_button = QtGui.QPushButton('Refresh')
         refresh_button.clicked.connect(self.refresh_button_clicked)
-
         treeview_vbox.addWidget(refresh_button)
+
+        add_button = QtGui.QPushButton('+')
+        add_button.clicked.connect(self.add_button_clicked)
+        treeview_vbox.addWidget(add_button)
+
+        remove_button = QtGui.QPushButton('-')
+        remove_button.clicked.connect(self.remove_button_clicked)
+        treeview_vbox.addWidget(remove_button)
         
         splitter.addWidget(treeview_parent_frame)
         self.treeview.setHeaderHidden(True)
@@ -140,6 +148,32 @@ class HierarchyTreeview(QtGui.QWidget):
         splitter.setSizes([400, 200])
 
 
+    def add_button_clicked(self):
+
+        if(self.treeview.selectionModel().hasSelection()):
+            for index in self.treeview.selectedIndexes():
+                item = self.model.itemFromIndex(index)
+                item.appendRow(QtGui.QStandardItem('ITEM'))
+
+        else:
+            #print('adding to root')
+            item = self.model.invisibleRootItem()
+            item.appendRow(QtGui.QStandardItem('ROOT'))
+
+
+    def remove_button_clicked(self):
+
+        if(self.treeview.selectionModel().hasSelection()):
+
+            for index in self.treeview.selectedIndexes():
+
+                row = index.row()
+                item = self.model.itemFromIndex(index)
+                parent = item.parent()
+
+                parent_index = self.model.indexFromItem(parent)
+                self.model.removeRow(row, parent_index)
+
     @staticmethod
     def get_item_recurse(item, dag_path_dict, parent_list=None):
         '''Returns the dag_path_dict with the leaf item as key and the 
@@ -209,7 +243,7 @@ class HierarchyTreeview(QtGui.QWidget):
 
         self.button_list = []
 
-        for name in ['INT_DRIVER_SEAT', 'G__INT_DRIVER_SEAT', 'INT_PASSENGER_SEAT', 'G__INT_PASSENGER_SEAT']:
+        for name in ['INT_DRIVER_SEAT', 'G__INT_DRIVER_SEAT', 'INT_PASSENGER_SEAT', 'G__INT_PASSENGER_SEAT', 'ROOF']:
             if name in keys:
                 self.add_button(name, self.dag_path_dict[name], self.button_vbox)
 
