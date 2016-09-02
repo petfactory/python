@@ -1,6 +1,6 @@
 from fpdf import FPDF
 from datetime import date
-import pprint
+import os, pprint
 
 class PDF(FPDF):
 
@@ -63,7 +63,9 @@ def buildPage(name_list, row_list, col_list, pdf):
 
     #pdf.rect(x=grid_offset_x, y=grid_offset_y, w=grid_total_width, h=grid_total_height, style = '')
 
-    img_width = 160.0
+    img_width = 130.0
+    rect_width = 150.0
+    img_scale = .8
     size = 10
 
     for index, name in enumerate(name_list):
@@ -71,15 +73,15 @@ def buildPage(name_list, row_list, col_list, pdf):
         row = index/(grid_num_rows-1)
         col = index%(grid_num_cols)
 
-        print row, col
+        #print row, col
         x = col_list[col]
         y = row_list[row]
 
-        pdf.image('mario_300_frame.png', x=x-img_width*.5, y=y-img_width*.5, w=img_width, h=img_width)
+        pdf.rect(x=x-rect_width*.5, y=y-rect_width*.5, w=rect_width, h=rect_width)
 
-        pdf.rect(x=x-size*.5, y=y-size*.5, w=size, h=size, style = 'F')
+        pdf.image(name, x=x-img_width*.5, y=y-img_width*.5, w=img_width, h=img_width)
 
-        pdf.text(x=x-img_width*.5, y=y+14+img_width*.5, txt='{} {}'.format(index, name))
+        pdf.text(x=x-rect_width*.5, y=y+16+rect_width*.5, txt=name)
 
 
 # Instantiation of inherited class
@@ -87,7 +89,12 @@ def buildPage(name_list, row_list, col_list, pdf):
 
 row_list, col_list = build_placement_grid(total_width, total_height, grid_total_width, grid_total_height, grid_num_cols, grid_num_rows, grid_offset_x, grid_offset_y)
 
-seq = [c for c in 'abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQR']
+#seq = [c for c in 'abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQR']
+seq = [ os.path.join('images', f) for f in os.listdir('images')]
+
+seq.extend(seq)
+
+
 chunk_length = 12
 chunk_list = [seq[x:x+chunk_length] for x in xrange(0, len(seq), chunk_length)]
 
