@@ -1,0 +1,33 @@
+{
+	"cv":
+	[
+			{
+				"date":"2015-10-01",
+				"client":"Client name",
+				"website":"http://www.client.com/",
+				"contact":"Client Clientsson",
+				"title":"Visualization",
+				"info":"ONE Product visualization of clients awesome stuff",
+				"tags":["visualization", "awesome"]
+			},
+
+			{
+				"date":"2015-09-01",
+				"client":"Client name",
+				"website":"http://www.client.com/",
+				"contact":"Client Clientsson",
+				"title":"Visualization",
+				"info":"TWO Product visualization of clients awesome stuff",
+				"tags":["visualization", "awesome"]
+			},
+			{
+				"date":"2015-08-01",
+				"client":"Client name",
+				"website":"http://www.client.com/",
+				"contact":"Client Clientsson",
+				"title":"Visualization",
+				"info":"THREE Product visualization of clients awesome stuff",
+				"tags":["visualization", "awesome"]
+			}
+	]
+}
