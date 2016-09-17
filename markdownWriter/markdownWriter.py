@@ -24,14 +24,30 @@ def createMarkdown():
 
     for clientDict in json_data.get('cv'):
         date = clientDict.get('date')
+        client = clientDict.get('client')
+        contact = clientDict.get('contact')
         title = clientDict.get('title')
         info = clientDict.get('info')
         tags = clientDict.get('tags')
         website = clientDict.get('website')
 
-        destFile = os.path.join(destMdDir, '{}-{}'.format(date, title))
+        titleHyphenated = '-'.join(title.split(' '))
+        #print titleHyphenated
+
+        destFile = os.path.join(destMdDir, '{}-{}.md'.format(date, titleHyphenated))
+        s = '---\n'
         with open(destFile, 'w') as f:
-            s = '---\nwebsite: {website}\n---\n{info}'.format(website=website, info=info)
+            #s = '---\nwebsite: {website}\n---\n{info}'.format(website=website, info=info)
+            s += 'client: {}\n'.format(client)
+            s += 'contact: {}\n'.format(contact)
+            s += 'website: {}\n'.format(website)
+            
+            if len(tags) > 0:
+                s += 'tags: {}\n'.format('[{}]'.format(', '.join(tags)))
+            s += '---\n\n'
+
+            s += info
+
             f.write(s)
 
 createMarkdown()

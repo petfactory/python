@@ -3,29 +3,29 @@
 	[
 			{
 				"date":"2015-10-01",
-				"client":"Client name",
+				"client":"Client name ONE",
 				"website":"http://www.client.com/",
 				"contact":"Client Clientsson",
-				"title":"Visualization",
+				"title":"An exiting project",
 				"info":"ONE Product visualization of clients awesome stuff",
 				"tags":["visualization", "awesome"]
 			},
 
 			{
 				"date":"2015-09-01",
-				"client":"Client name",
+				"client":"Client name TWO",
 				"website":"http://www.client.com/",
 				"contact":"Client Clientsson",
-				"title":"Visualization",
+				"title":"Visualization of product",
 				"info":"TWO Product visualization of clients awesome stuff",
-				"tags":["visualization", "awesome"]
+				"tags":["visualization", "Graphic design"]
 			},
 			{
 				"date":"2015-08-01",
-				"client":"Client name",
+				"client":"Client name THREE",
 				"website":"http://www.client.com/",
 				"contact":"Client Clientsson",
-				"title":"Visualization",
+				"title":"Motion graphics",
 				"info":"THREE Product visualization of clients awesome stuff",
 				"tags":["visualization", "awesome"]
 			}
